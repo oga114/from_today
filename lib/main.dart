@@ -1,124 +1,78 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Testaaa',
-      theme: ThemeData(
-
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple.shade50),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Test'),
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-
-
-  final String title;
-
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-
-      _counter++;
-    });
-  }
-
-  void _counterDmecremet(){
-    setState(() {
-      _counter--;
-    });
-  }
-
-  void _counterReset(){
-    setState(() {
-      _counter = 0;
-    });
-  }
-
-
+  DateTime? _selectedDate;
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
-
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-
-        title: Text(widget.title),
+        title: Text('今日からあの日まで…'),
       ),
       body: Center(
-
         child: Column(
-
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('うんこ',),
-            const Text('うんこ',),
-            const Text('うんこ',),
-            const Text('うんこ',),
-            const Text('うんこ',),
-            const Text('うんこ',),
-            const Text('うんこ',),
-            const Text('うんこ',),
-
-
-            const Text(
-              'You have pushed the button this many times:',
+          children: [
+            if (_selectedDate != null)
+              Text('Selected Date: ${DateFormat('yyyy-MM-dd').format(_selectedDate!)}'),
+            if (_selectedDate != null)
+              SizedBox(height: 20), // 選択した日と日数の表示の間にスペースを追加
+            if (_selectedDate != null)
+              Text(
+                'Days difference: ${_calculateDaysDifference()}',
+                style: TextStyle(fontSize: 2 * Theme.of(context).textTheme.headline6!.fontSize!), // フォントサイズを3倍に設定
+              ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => _selectDate(context),
+              child: Text('Select Date'),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
 
-            ),
           ],
         ),
       ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            onPressed: _incrementCounter,
-            tooltip: 'Increment',
-            child: const Icon(Icons.add),
-          ),
-          SizedBox(width: 20),
-          FloatingActionButton(
-            onPressed: _counterDmecremet, // 別の関数を呼び出すなど
-            tooltip: 'Decrement', // ツールチップ（オプション）
-            child: const Icon(Icons.remove), // ボタンのアイコン
-          ),
-          SizedBox(width: 20), // ボタン間のスペースを設定
-          FloatingActionButton(
-            onPressed: _counterReset, // 別の関数を呼び出すなど
-            tooltip: 'Reset', // ツールチップ（オプション）
-            child: const Icon(Icons.refresh), // ボタンのアイコン
-          ),
-        ],
-      ),
-
-
-      // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(DateTime.now().year - 5),
+      lastDate: DateTime(DateTime.now().year + 5),
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
+
+  int _calculateDaysDifference() {
+    if (_selectedDate == null) {
+      return 0;
+    } else {
+      DateTime today = DateTime.now().toLocal().subtract(Duration(hours: DateTime.now().hour, minutes: DateTime.now().minute, seconds: DateTime.now().second, milliseconds: DateTime.now().millisecond, microseconds: DateTime.now().microsecond));
+      return _selectedDate!.difference(today).inDays.abs();
+    }
   }
 }
