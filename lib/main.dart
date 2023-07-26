@@ -32,6 +32,16 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Text(
+              'Today is ${DateTime.now()}',
+              style: TextStyle(fontSize: 15),
+            ),
+            SizedBox(height: 10),
+            Text(
+              '地球が生まれてから約${_calculateDaysSinceEarthBirth()}日が経過しました',
+              style: TextStyle(fontSize: 15),
+            ),
+            SizedBox(height: 20),
             if (_selectedDate != null)
               Text('Selected Date: ${DateFormat('yyyy-MM-dd').format(_selectedDate!)}'),
             if (_selectedDate != null)
@@ -41,11 +51,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 'Days difference: ${_calculateDaysDifference()}',
                 style: TextStyle(fontSize: 2 * Theme.of(context).textTheme.headline6!.fontSize!), // フォントサイズを3倍に設定
               ),
-            SizedBox(height: 20),
+            if (_selectedDate == null)
+              SizedBox(height: 20), // カレンダーを表示する前のスペースを追加
             ElevatedButton(
               onPressed: () => _selectDate(context),
               child: Text('Select Date'),
             ),
+            if (_selectedDate != null)
+              SizedBox(height: 20), // カレンダーを選択後のスペースを追加
 
           ],
         ),
@@ -57,8 +70,8 @@ class _MyHomePageState extends State<MyHomePage> {
     DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(DateTime.now().year - 5),
-      lastDate: DateTime(DateTime.now().year + 5),
+      firstDate: DateTime(DateTime.now().year - 4600000000),
+      lastDate: DateTime(DateTime.now().year + 100),
     );
     if (picked != null) {
       setState(() {
@@ -74,5 +87,17 @@ class _MyHomePageState extends State<MyHomePage> {
       DateTime today = DateTime.now().toLocal().subtract(Duration(hours: DateTime.now().hour, minutes: DateTime.now().minute, seconds: DateTime.now().second, milliseconds: DateTime.now().millisecond, microseconds: DateTime.now().microsecond));
       return _selectedDate!.difference(today).inDays.abs();
     }
+  }
+
+  int _calculateDaysSinceEarthBirth() {
+    DateTime birthDate = DateTime(4600000000, 1, 1); // 地球が生まれたとされる日付
+    DateTime today = DateTime.now().toLocal().subtract(Duration(
+      hours: DateTime.now().hour,
+      minutes: DateTime.now().minute,
+      seconds: DateTime.now().second,
+      milliseconds: DateTime.now().millisecond,
+      microseconds: DateTime.now().microsecond,
+    ));
+    return birthDate.difference(today).inDays.abs();
   }
 }
